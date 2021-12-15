@@ -19,6 +19,20 @@ class ChatView extends GetView<ChatController> {
         child: Column(
           children: [
             Expanded(
+              child: Obx(() {
+                return Container(
+                  padding: EdgeInsets.all(10.0),
+                  child: Text(
+                    'Connected User ${controller.connectedUser}',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: white,
+                    ),
+                  ),
+                );
+              }),
+            ),
+            Expanded(
               flex: 9,
               child: Obx(() {
                 return ListView.builder(
@@ -86,7 +100,8 @@ class ChatView extends GetView<ChatController> {
 class MessageItem extends StatelessWidget {
   const MessageItem({
     Key? key,
-    required this.sentByMe, required this.message,
+    required this.sentByMe,
+    required this.message,
   }) : super(key: key);
 
   final bool sentByMe;

@@ -8,6 +8,7 @@ class ChatController extends GetxController {
   late IO.Socket socket;
 
   var chatMessage = <MessageModel>[].obs;
+  var connectedUser = 0.obs;
 
   @override
   void onInit() {
@@ -48,6 +49,11 @@ class ChatController extends GetxController {
     socket.on('message-receive', (data) {
       print(data);
       chatMessage.add(MessageModel.fromJson(data));
+    });
+
+    socket.on('connected-user', (data) {
+      print(data);
+      connectedUser.value = data;
     });
   }
 }
