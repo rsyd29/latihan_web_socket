@@ -20,16 +20,18 @@ class ChatView extends GetView<ChatController> {
           children: [
             Expanded(
               flex: 9,
-              child: Container(
-                child: ListView.builder(
-                  itemCount: 10,
+              child: Obx(() {
+                return ListView.builder(
+                  itemCount: controller.chatMessage.length,
                   itemBuilder: (context, index) {
+                    var currentItem = controller.chatMessage[index];
                     return MessageItem(
-                      sentByMe: true,
+                      sentByMe: currentItem.sentByMe == controller.socket.id,
+                      message: currentItem.message,
                     );
                   },
-                ),
-              ),
+                );
+              }),
             ),
             Expanded(
               child: Container(
@@ -60,7 +62,10 @@ class ChatView extends GetView<ChatController> {
                         ),
                       ),
                       child: IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          controller.sendMessage(
+                              controller.chatController.text.trim());
+                        },
                         icon: Icon(
                           Icons.send,
                           color: Colors.white,
@@ -81,10 +86,11 @@ class ChatView extends GetView<ChatController> {
 class MessageItem extends StatelessWidget {
   const MessageItem({
     Key? key,
-    required this.sentByMe,
+    required this.sentByMe, required this.message,
   }) : super(key: key);
 
   final bool sentByMe;
+  final String message;
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +115,7 @@ class MessageItem extends StatelessWidget {
           textBaseline: TextBaseline.alphabetic,
           children: [
             Text(
-              "Hello",
+              message,
               style: TextStyle(fontSize: 18, color: sentByMe ? white : blue),
             ),
             SizedBox(

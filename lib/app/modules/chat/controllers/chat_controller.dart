@@ -1,37 +1,53 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:latihan_web_socket/model/message_model.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class ChatController extends GetxController {
   late TextEditingController chatController;
+  late IO.Socket socket;
 
-  final channel = WebSocketChannel.connect(
-    Uri.parse('wss://echo.websocket.org'),
-  );
-
-  void sendMessage() {
-    if (chatController.text.trim().isNotEmpty) {
-      channel.sink.add(chatController.text.trim());
-    }
-    chatController.clear();
-    update();
-  }
+  var chatMessage = <MessageModel>[].obs;
 
   @override
   void onInit() {
     chatController = TextEditingController();
-    super.onInit();
-  }
+    socket = IO.io(
+        'http://localhost:4000',
+        IO.OptionBuilder()
+            .setTransports(['websocket'])
+            .disableAutoConnect()
+            .build());
 
-  @override
-  void onReady() {
-    super.onReady();
+    socket.connect();
+    setUpSocketListener();
+    super.onInit();
   }
 
   @override
   void onClose() {
     chatController.dispose();
-    channel.sink.close();
+
     super.dispose();
+  }
+
+  void sendMessage(String text) {
+    if (text.isNotEmpty) {
+      var messageJson = {
+        "message": text,
+        "sentByMe": socket.id,
+      };
+      socket.emit('message', messageJson);
+      chatMessage.add(MessageModel.fromJson(messageJson));
+    }
+    chatController.clear();
+    update();
+  }
+
+  void setUpSocketListener() {
+    socket.on('message-receive', (data) {
+      print(data);
+      chatMessage.add(MessageModel.fromJson(data));
+    });
   }
 }
