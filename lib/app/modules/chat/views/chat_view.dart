@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:latihan_web_socket/constant.dart';
 
 import '../controllers/chat_controller.dart';
@@ -42,6 +43,7 @@ class ChatView extends GetView<ChatController> {
                     return MessageItem(
                       sentByMe: currentItem.sentByMe == controller.socket.id,
                       message: currentItem.message,
+                      date: currentItem.date,
                     );
                   },
                 );
@@ -102,13 +104,16 @@ class MessageItem extends StatelessWidget {
     Key? key,
     required this.sentByMe,
     required this.message,
+    required this.date,
   }) : super(key: key);
 
   final bool sentByMe;
   final String message;
+  final String date;
 
   @override
   Widget build(BuildContext context) {
+    var parseDate = DateTime.parse(date);
     return Align(
       alignment: sentByMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
@@ -137,7 +142,7 @@ class MessageItem extends StatelessWidget {
               width: 5,
             ),
             Text(
-              "1:10 PM",
+              DateFormat.jm().format(parseDate),
               style: TextStyle(
                 fontSize: 10,
                 color: (sentByMe ? white : blue).withOpacity(0.7),

@@ -28,7 +28,7 @@ class ChatController extends GetxController {
   @override
   void onClose() {
     chatController.dispose();
-
+    socket.close();
     super.dispose();
   }
 
@@ -37,6 +37,7 @@ class ChatController extends GetxController {
       var messageJson = {
         "message": text,
         "sentByMe": socket.id,
+        "date": DateTime.now().toIso8601String(),
       };
       socket.emit('message', messageJson);
       chatMessage.add(MessageModel.fromJson(messageJson));
